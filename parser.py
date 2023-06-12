@@ -77,4 +77,20 @@ async def do_parse():
     return 0
 
 
+async def remove_yesterday_table_data():
+    con = psycopg2.connect(
+        database="parse_news",
+        user="postgres",
+        password="admin",
+        host="localhost",
+        port="5432"
+    )
+    cur = con.cursor()
+    cur.execute(f"DELETE FROM ria_news_table WHERE add_date < date_trunc('day', CURRENT_TIMESTAMP)")
+    con.commit()
+    cur.close()
+    con.close()
+    print('Данные удалены')
+    return 0
+
 #asyncio.run(do_parse())

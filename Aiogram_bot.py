@@ -1,7 +1,7 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from config import TOKEN_API, API_key
-from parser import do_parse
+from parser import do_parse, remove_yesterday_table_data
 from datetime import datetime
 import requests
 import json
@@ -72,6 +72,7 @@ async def get_wether(message: types.Message):
 
 
 async def scheduler():
+    aioschedule.every().day.at('00:05').do(remove_yesterday_table_data)
     aioschedule.every(15).minutes.do(do_parse)
     while True:
         await aioschedule.run_pending()
