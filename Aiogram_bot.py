@@ -38,10 +38,17 @@ async def get_news(callback: types.CallbackQuery):
     cur.execute('SELECT title, url_href, text FROM ria_news_table ORDER BY add_date DESC LIMIT 5')
     rows = cur.fetchall()
     for row in rows:
-        await callback.message.answer(
-            text=f'<b>{row[0]}</b>\n\n{row[2]}\n\n <b>Ссылка  на источник:</b> <a href="{row[1]}">{row[1]}</a>',
-            parse_mode='HTML', disable_web_page_preview=True)
-        await asyncio.sleep(1)
+        if len(row[2]) <= 4096:
+            await callback.message.answer(
+                text=f'<b>{row[0]}</b>\n\n{row[2]}\n\n <b>Ссылка  на источник:</b> <a href="{row[1]}">{row[1]}</a>',
+                parse_mode='HTML', disable_web_page_preview=True)
+            await asyncio.sleep(1)
+        else:
+            await callback.message.answer(
+                text=f'<b>{row[0]}</b>\n\n{row[2][0:4096]} . . .\n\n <b>Ссылка  на источник:</b> <a href="{row[1]}">{row[1]}</a>',
+                parse_mode='HTML', disable_web_page_preview=True)
+            await asyncio.sleep(1)
+
     cur.close()
     con.close()
 
