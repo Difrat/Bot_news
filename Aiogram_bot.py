@@ -112,7 +112,7 @@ async def on_shutdown(dp):
     await dp.storage.close()
     await dp.storage.wait_closed()
 
-    logging.warning('Bye!')
+    logging.warning('Bye=)!')
 
 
 if __name__ == '__main__':
