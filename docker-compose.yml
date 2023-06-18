@@ -4,7 +4,9 @@ services:
     build: .
     restart: always
     environment:
-      - POSTGRES_URL=postgres://postgres:admin@postgreSQL:5432/parser_news
+      - POSTGRES_URL=postgres://postgres:admin@postgreSQL:5432/parse_news
+    ports:
+      - 3001:3001
     networks: 
       - postgres
 
