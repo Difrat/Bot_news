@@ -1,21 +1,35 @@
-from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from config import TOKEN_API, API_key
-from parser import do_parse, remove_yesterday_table_data
-from datetime import datetime
+import logging
 import requests
 import json
 import aioschedule
 import asyncio
 import psycopg2
 
+from config import API_key
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from parser import do_parse, remove_yesterday_table_data
+from aiogram import Bot, types
+from aiogram.contrib.middlewares.logging import LoggingMiddleware
+from aiogram.dispatcher import Dispatcher
+from aiogram.utils.executor import start_webhook
 
-now = datetime.now()
-current_time = now.strftime("%H:%M:%S")
 
-bot = Bot(TOKEN_API)
+API_TOKEN = '6233295058:AAFExBW2PZ9Aeau9j2sZ2wrtqXmE6zAhYtI'
+
+# webhook settings
+WEBHOOK_HOST = 'https://f86f-77-34-132-24.ngrok-free.app'
+WEBHOOK_PATH = '/path/to/api'
+WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
+
+# webserver settings
+WEBAPP_HOST = 'localhost'  # or ip
+WEBAPP_PORT = 3001
+
+logging.basicConfig(level=logging.INFO)
+
+bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
-
+dp.middleware.setup(LoggingMiddleware())
 
 ikb = InlineKeyboardMarkup(resize_keyboard=True, row_width=2)
 ibtn1 = InlineKeyboardButton(text='Хабр', url='https://habr.com')
@@ -69,7 +83,7 @@ async def get_ikb(message: types.message):
 
 
 @dp.message_handler(content_types=['text'])
-async def get_wether(message: types.Message):
+async def get_weather(message: types.Message):
     city = message.text.strip().lower()
     res = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_key}&units=metric&lang=ru')
     data = json.loads(res.text)
@@ -86,8 +100,30 @@ async def scheduler():
         await asyncio.sleep(1)
 
 
-async def on_startup(_):
+async def on_startup(dp):
+    await bot.set_webhook(WEBHOOK_URL)
     asyncio.create_task(scheduler())
 
 
-executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+async def on_shutdown(dp):
+    logging.warning('Shutting down..')
+
+    await bot.delete_webhook()
+
+    await dp.storage.close()
+    await dp.storage.wait_closed()
+
+    logging.warning('Bye!')
+
+
+if __name__ == '__main__':
+    start_webhook(
+        dispatcher=dp,
+        webhook_path=WEBHOOK_PATH,
+        on_startup=on_startup,
+        on_shutdown=on_shutdown,
+        skip_updates=True,
+        host=WEBAPP_HOST,
+        port=WEBAPP_PORT,
+    )
+

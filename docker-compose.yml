@@ -1,13 +1,12 @@
 version: "3.9"
 services:
   bot: 
-    build: /home/vboxuser/Desktop/postgreSQL_test/Bot_news/
+    build: .
     restart: always
     environment:
       - POSTGRES_URL=postgres://postgres:admin@postgreSQL:5432/parser_news
     networks: 
       - postgres
-
 
 
   postgres:
@@ -44,7 +43,7 @@ services:
       - "-c"
       - "pg_stat_statements.track=all"
     environment:
-      POSTGRES_DB: "parser_news"
+      POSTGRES_DB: "parse_news"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "admin"
       PGDATA: "/var/lib/postgresql/data/pgdata"
@@ -62,29 +61,9 @@ services:
       - postgres
 
 
-  pgadmin:
-    container_name: pgadmin_container
-    image: dpage/pgadmin4:7.2
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "bozhenko_m_v@bk.ru"
-      PGADMIN_DEFAULT_PASSWORD: "admin"
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    ports: 
-        - 5050:80
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 1G
-    networks:
-      - postgres
-
 volumes:
   db_postgres:
-  pgadmin-data:
+
 
 networks:
   postgres:
