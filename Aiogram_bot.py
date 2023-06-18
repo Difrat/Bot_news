@@ -5,7 +5,7 @@ import aioschedule
 import asyncio
 import psycopg2
 
-from config import API_key
+from config import API_key, TOKEN_API_WebHook
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from parser import do_parse, remove_yesterday_table_data
 from aiogram import Bot, types
@@ -14,20 +14,19 @@ from aiogram.dispatcher import Dispatcher
 from aiogram.utils.executor import start_webhook
 
 
-API_TOKEN = '6233295058:AAFExBW2PZ9Aeau9j2sZ2wrtqXmE6zAhYtI'
 
 # webhook settings
-WEBHOOK_HOST = 'https://f86f-77-34-132-24.ngrok-free.app'
+WEBHOOK_HOST = 'https://7a7b-77-34-132-24.ngrok-free.app'
 WEBHOOK_PATH = '/path/to/api'
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
 
 # webserver settings
-WEBAPP_HOST = 'localhost'  # or ip
+WEBAPP_HOST = 'localhost'
 WEBAPP_PORT = 3001
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=TOKEN_API_WebHook)
 dp = Dispatcher(bot)
 dp.middleware.setup(LoggingMiddleware())
 
